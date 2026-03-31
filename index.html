@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Learning Hub | Gemini Powered</title>
+    <title>StudyAI | Jouw AI Werkbladen Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
@@ -12,77 +12,85 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; }
         .glass { backdrop-filter: blur(12px); border: 1px solid rgba(150, 150, 150, 0.1); }
         .dark .glass { background: rgba(255, 255, 255, 0.03); }
-        .light .glass { background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.1); }
+        .light .glass { background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.1); }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
         .modal.active { display: flex; }
-        .chat-bubble { animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Print styling zodat het werkblad er goed uitziet op papier */
+        @media print {
+            nav, header, .no-print, button { display: none !important; }
+            .modal { position: relative; display: block; background: white; color: black; padding: 0; }
+            .glass { border: none; background: white; backdrop-filter: none; }
+            #chat-output { overflow: visible; height: auto; }
+            .chat-bubble { border: 1px solid #ccc; margin: 10px 0; page-break-inside: avoid; color: black !important; }
+        }
     </style>
 </head>
 <body class="dark bg-slate-950 text-slate-200 min-h-screen">
 
-    <nav class="border-b border-white/10 p-4 sticky top-0 bg-inherit backdrop-blur-lg z-50">
+    <nav class="border-b border-white/10 p-4 sticky top-0 bg-inherit backdrop-blur-lg z-50 no-print">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2 cursor-pointer" onclick="location.reload()">
-                <div class="bg-blue-600 p-1.5 rounded-lg"><i data-lucide="sparkles" class="text-white w-5 h-5"></i></div>
-                <span class="text-xl font-bold dark:text-white text-slate-900 tracking-tight">AI<span class="text-blue-500">Learn</span></span>
+                <div class="bg-indigo-600 p-1.5 rounded-lg"><i data-lucide="graduation-cap" class="text-white w-5 h-5"></i></div>
+                <span class="text-xl font-bold dark:text-white text-slate-900 tracking-tight text-indigo-500">StudyAI</span>
             </div>
             <div class="flex items-center gap-4">
-                <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-slate-800/50 border border-white/10 transition">
-                    <i data-lucide="sun" id="sun-icon" class="hidden w-5 h-5 text-yellow-500"></i>
-                    <i data-lucide="moon" id="moon-icon" class="w-5 h-5 text-blue-400"></i>
-                </button>
+                <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-slate-800/50 border border-white/10"><i data-lucide="sun" id="sun-icon" class="hidden w-5 h-5 text-yellow-500"></i><i data-lucide="moon" id="moon-icon" class="w-5 h-5 text-blue-400"></i></button>
                 <div class="flex bg-slate-800/50 rounded-full p-1 border border-white/10">
-                    <button onclick="setLanguage('en')" id="lang-en" class="px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white transition-all">EN</button>
+                    <button onclick="setLanguage('en')" id="lang-en" class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-600 text-white transition-all">EN</button>
                     <button onclick="setLanguage('nl')" id="lang-nl" class="px-3 py-1 rounded-full text-xs font-bold text-slate-400 transition-all">NL</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <header class="max-w-4xl mx-auto pt-16 pb-10 px-4 text-center">
-        <h1 id="hero-title" class="text-5xl md:text-7xl font-extrabold mb-6 dark:text-white text-slate-900 tracking-tight">Learn with Gemini AI</h1>
-        <p id="hero-subtitle" class="text-slate-500 dark:text-slate-400 text-lg md:text-xl max-w-2xl mx-auto">Master Informatics, Dutch, and English with your personal AI assistant.</p>
+    <header class="max-w-4xl mx-auto pt-16 pb-10 px-4 text-center no-print">
+        <h1 id="hero-title" class="text-5xl md:text-6xl font-extrabold mb-6 dark:text-white text-slate-900 tracking-tight">Generate Study Sheets</h1>
+        <p id="hero-subtitle" class="text-slate-500 dark:text-slate-400 text-lg">Choose a subject and tell the AI what you want to learn today.</p>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 pb-20 grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div onclick="openApp('cs')" class="glass p-8 rounded-3xl cursor-pointer hover:border-blue-500 transition-all transform hover:-translate-y-2 group">
-            <div class="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="code-2" class="text-blue-500 w-8 h-8"></i></div>
+    <main class="max-w-6xl mx-auto px-4 pb-20 grid grid-cols-1 md:grid-cols-3 gap-8 no-print">
+        <div onclick="openApp('cs')" class="glass p-8 rounded-3xl cursor-pointer hover:border-indigo-500 transition-all transform hover:-translate-y-2 group">
+            <div class="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="binary" class="text-indigo-500 w-8 h-8"></i></div>
             <h3 class="text-2xl font-bold mb-3 dark:text-white text-slate-900" id="t-cs">Informatics</h3>
-            <p class="text-slate-500" id="d-cs">Explain code, debug, or learn data structures.</p>
+            <p class="text-slate-500" id="d-cs">Generate Python exercises or logic puzzles.</p>
         </div>
         <div onclick="openApp('nl')" class="glass p-8 rounded-3xl cursor-pointer hover:border-orange-500 transition-all transform hover:-translate-y-2 group">
-            <div class="w-14 h-14 bg-orange-500/10 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="book-open" class="text-orange-500 w-8 h-8"></i></div>
+            <div class="w-14 h-14 bg-orange-500/10 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="pen-tool" class="text-orange-500 w-8 h-8"></i></div>
             <h3 class="text-2xl font-bold mb-3 dark:text-white text-slate-900" id="t-nl">Dutch</h3>
-            <p class="text-slate-500" id="d-nl">Interactive sentence parsing and grammar guide.</p>
+            <p class="text-slate-500" id="d-nl">Grammar worksheets and sentence parsing.</p>
         </div>
         <div onclick="openApp('en')" class="glass p-8 rounded-3xl cursor-pointer hover:border-emerald-500 transition-all transform hover:-translate-y-2 group">
             <div class="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="languages" class="text-emerald-500 w-8 h-8"></i></div>
             <h3 class="text-2xl font-bold mb-3 dark:text-white text-slate-900" id="t-en">English</h3>
-            <p class="text-slate-500" id="d-en">Translations, writing help and conversation.</p>
+            <p class="text-slate-500" id="d-en">Vocab lists and reading comprehension tests.</p>
         </div>
     </main>
 
     <div id="ai-modal" class="modal">
-        <div class="glass w-full max-w-4xl p-6 md:p-10 rounded-[2rem] relative max-h-[90vh] flex flex-col shadow-2xl">
-            <button onclick="closeApp()" class="absolute top-6 right-6 text-slate-500 hover:text-white transition"><i data-lucide="x"></i></button>
-            <div class="flex items-center gap-3 mb-6">
-                <div id="modal-icon" class="p-2 bg-blue-500/20 rounded-lg text-blue-500"></div>
-                <div>
-                    <h2 id="modal-title" class="text-2xl font-bold dark:text-white text-slate-900">Assistant</h2>
-                    <p id="modal-desc" class="text-xs text-slate-500 uppercase tracking-widest font-bold"></p>
+        <div class="glass w-full max-w-4xl p-6 md:p-10 rounded-[2rem] relative max-h-[95vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="flex justify-between items-start mb-4 no-print">
+                <div class="flex items-center gap-3">
+                    <div id="modal-icon" class="p-2 bg-indigo-500/20 rounded-lg text-indigo-500"></div>
+                    <h2 id="modal-title" class="text-2xl font-bold dark:text-white text-slate-900">Generator</h2>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="window.print()" class="p-2 bg-slate-800 rounded-lg hover:bg-slate-700 text-white flex items-center gap-2 text-sm px-4 border border-white/10"><i data-lucide="printer" class="w-4 h-4"></i> Print / PDF</button>
+                    <button onclick="closeApp()" class="p-2 text-slate-500 hover:text-red-500 transition"><i data-lucide="x"></i></button>
                 </div>
             </div>
             
-            <div id="chat-output" class="flex-1 overflow-y-auto mb-6 space-y-6 pr-2 custom-scrollbar">
-                <div class="p-4 rounded-2xl bg-white/5 border border-white/5 text-slate-400 text-center italic">Ready for your question...</div>
+            <div id="chat-output" class="flex-1 overflow-y-auto mb-6 space-y-8 pr-2 custom-scrollbar p-2">
+                <div class="p-6 rounded-2xl bg-indigo-600/5 border border-indigo-500/20 text-indigo-400 text-center italic" id="welcome-box">
+                    Typ een onderwerp waar je een werkblad over wilt (bijv: "Looping in Python" of "D's en T's")
+                </div>
             </div>
 
-            <div class="flex gap-3 bg-slate-900/50 p-2 rounded-2xl border border-white/10">
-                <input type="text" id="user-input" onkeypress="if(event.key==='Enter') askGemini()" placeholder="Ask anything..." 
-                       class="flex-1 bg-transparent border-none rounded-xl px-4 py-3 outline-none dark:text-white text-slate-900">
-                <button onclick="askGemini()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition flex items-center gap-2">
-                    <span class="hidden md:block">Ask AI</span> <i data-lucide="send" class="w-4 h-4"></i>
+            <div class="flex gap-3 bg-slate-900/50 p-2 rounded-2xl border border-white/10 no-print">
+                <input type="text" id="user-input" onkeypress="if(event.key==='Enter') askGemini()" placeholder="Onderwerp werkblad..." 
+                       class="flex-1 bg-transparent border-none rounded-xl px-4 py-4 outline-none dark:text-white text-slate-900">
+                <button onclick="askGemini()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-4 rounded-xl font-bold transition flex items-center gap-2">
+                    <span>Generate</span> <i data-lucide="wand-2" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
@@ -101,22 +109,22 @@
 
         const content = {
             en: {
-                heroH: "Learn with Gemini AI", heroP: "Master Informatics, Dutch, and English with your personal AI assistant.",
-                csH: "Informatics", csD: "Explain code, debug, or learn data structures.",
-                nlH: "Dutch", nlD: "Interactive sentence parsing and grammar guide.",
-                enH: "English", enD: "Translations, writing help and conversation.",
-                prompt_cs: "You are an Informatics teacher. Explain this code or computer science concept simply. Use code blocks if needed: ",
-                prompt_nl: "Jij bent een docent Nederlands. Ontleed de ingevoerde zin volledig (zinsdelen benoemen) of leg de grammatica uit. Wees duidelijk en formeel: ",
-                prompt_en: "You are an English teacher. Help the user with English grammar, translations, or practice a conversation: "
+                heroH: "Generate StudyAI Sheets", heroP: "Choose a subject and tell the AI what you want to learn today.",
+                csH: "Informatics", csD: "Generate Python exercises or logic puzzles.",
+                nlH: "Dutch", nlD: "Grammar worksheets and sentence parsing.",
+                enH: "English", enD: "Vocab lists and reading comprehension tests.",
+                prompt_cs: "Create a professional Informatics worksheet. Include: 1. A short title. 2. A brief explanation of the concept: ",
+                prompt_nl: "Maak een professioneel werkblad Nederlands. Inclusief: 1. Titel. 2. Korte uitleg. 3. 10 Oefeningen. 4. Antwoordsleutel onderaan. Onderwerp: ",
+                prompt_en: "Create a professional English worksheet. Include: 1. Title. 2. Theory/Rules. 3. Practice questions. 4. Answer key at bottom. Topic: "
             },
             nl: {
-                heroH: "Leer met Gemini AI", heroP: "Beheers Informatica, Nederlands en Engels met jouw persoonlijke AI-assistent.",
-                csH: "Informatica", csD: "Code uitleggen, debuggen of algoritmes leren.",
-                nlH: "Nederlands", nlD: "Interactieve zinsontleding en grammatica hulp.",
-                enH: "Engels", enD: "Vertalingen, hulp bij schrijven en gesprekken.",
-                prompt_cs: "Je bent een docent Informatica. Leg deze code of dit concept simpel uit. Gebruik codeblokken waar nodig: ",
-                prompt_nl: "Jij bent een docent Nederlands. Ontleed deze zin volledig (zinsdelen benoemen zoals PV, Onderwerp, etc.) of leg de grammatica uit: ",
-                prompt_en: "Je bent een docent Engels. Help de gebruiker met grammatica, vertalingen of oefen een gesprek: "
+                heroH: "StudyAI Werkbladen", heroP: "Kies een vak en laat de AI direct een leerzaam werkblad maken.",
+                csH: "Informatica", csD: "Maak Python opdrachten of logica puzzels.",
+                nlH: "Nederlands", nlD: "Werkbladen voor spelling, ontleden en grammatica.",
+                enH: "Engels", enD: "Woordjes leren en begrijpend lezen toetsen.",
+                prompt_cs: "Maak een professioneel werkblad Informatica. Inclusief: 1. Titel. 2. Korte uitleg van het concept. 3. 5-10 opdrachten/code snippets. 4. Antwoordsleutel onderaan. Onderwerp: ",
+                prompt_nl: "Maak een professioneel werkblad Nederlands. Inclusief: 1. Titel. 2. Korte uitleg. 3. 10 Oefeningen. 4. Antwoordsleutel onderaan. Onderwerp: ",
+                prompt_en: "Maak een professioneel werkblad Engels. Inclusief: 1. Titel. 2. Theorie/Grammatica uitleg. 3. Oefenvragen. 4. Antwoordsleutel onderaan. Onderwerp: "
             }
         };
 
@@ -128,15 +136,16 @@
             document.getElementById('t-cs').innerText = c.csH; document.getElementById('d-cs').innerText = c.csD;
             document.getElementById('t-nl').innerText = c.nlH; document.getElementById('d-nl').innerText = c.nlD;
             document.getElementById('t-en').innerText = c.enH; document.getElementById('d-en').innerText = c.enD;
-            document.getElementById('lang-en').className = l === 'en' ? 'px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white transition-all' : 'px-3 py-1 rounded-full text-xs font-bold text-slate-400 transition-all';
-            document.getElementById('lang-nl').className = l === 'nl' ? 'px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white transition-all' : 'px-3 py-1 rounded-full text-xs font-bold text-slate-400 transition-all';
+            document.getElementById('welcome-box').innerText = l === 'nl' ? 'Typ een onderwerp waar je een werkblad over wilt...' : 'Type a topic for your worksheet...';
+            
+            document.getElementById('lang-en').className = l === 'en' ? 'px-3 py-1 rounded-full text-xs font-bold bg-indigo-600 text-white' : 'px-3 py-1 rounded-full text-xs font-bold text-slate-400';
+            document.getElementById('lang-nl').className = l === 'nl' ? 'px-3 py-1 rounded-full text-xs font-bold bg-indigo-600 text-white' : 'px-3 py-1 rounded-full text-xs font-bold text-slate-400';
         }
 
         function openApp(subject) {
             currentSubject = subject;
             document.getElementById('modal-title').innerText = content[currentLang][subject + 'H'];
-            document.getElementById('modal-desc').innerText = subject;
-            const icons = { cs: 'code-2', nl: 'book-open', en: 'languages' };
+            const icons = { cs: 'binary', nl: 'pen-tool', en: 'languages' };
             document.getElementById('modal-icon').innerHTML = `<i data-lucide="${icons[subject]}"></i>`;
             document.getElementById('ai-modal').classList.add('active');
             document.getElementById('chat-output').innerHTML = '';
@@ -152,22 +161,22 @@
             if(!text) return;
 
             if(retryCount === 0) {
-                appendMessage('user', text);
+                output.innerHTML = ''; // Scherm leegmaken voor nieuw werkblad
                 input.value = '';
             }
 
             const availableKeys = API_KEYS.filter(k => !blockedKeys.has(k));
             if(availableKeys.length === 0) {
-                const waitId = appendStatus("All systems busy. Retrying in 5s...", "text-orange-500");
-                setTimeout(() => { document.getElementById(waitId).remove(); askGemini(retryCount + 1, text); }, 5000);
+                appendStatus("Systeem overbelast. Even geduld...", "text-orange-500");
+                setTimeout(() => askGemini(retryCount + 1, text), 5000);
                 return;
             }
 
             const selectedKey = availableKeys[Math.floor(Math.random() * availableKeys.length)];
-            const loadingId = appendStatus("Gemini is thinking...", "text-blue-400 animate-pulse");
+            const loadingId = appendStatus("StudyAI is aan het schrijven...", "text-indigo-400 animate-pulse no-print");
 
             try {
-                const prompt = content[currentLang]['prompt_' + currentSubject] + text;
+                const prompt = content[currentLang]['prompt_' + currentSubject] + text + ". Maak gebruik van duidelijke kopjes en witregels.";
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${selectedKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -184,49 +193,41 @@
                 }
 
                 const aiResponse = data.candidates[0].content.parts[0].text;
-                appendMessage('ai', aiResponse);
+                renderWorksheet(aiResponse);
 
             } catch (e) {
                 if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
-                if(retryCount < 3) {
-                    askGemini(retryCount + 1, text);
-                } else {
-                    appendStatus("Server busy. Try again later.", "text-red-500");
-                }
+                if(retryCount < 3) askGemini(retryCount + 1, text);
             }
         }
 
-        function appendMessage(sender, text) {
+        function renderWorksheet(text) {
             const output = document.getElementById('chat-output');
             const div = document.createElement('div');
-            div.className = sender === 'user' ? "chat-bubble p-4 bg-white/5 border border-white/10 rounded-2xl ml-12 text-right" : "chat-bubble p-5 bg-blue-600/10 border border-blue-500/20 rounded-2xl mr-12 relative group";
+            div.className = "chat-bubble p-8 bg-white/5 border border-white/10 rounded-3xl dark:text-slate-200 text-slate-800 shadow-xl leading-relaxed";
             
-            const copyBtn = sender === 'ai' ? `<button onclick="copyText(this)" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition p-1 bg-slate-800 rounded text-slate-400 hover:text-white"><i data-lucide="copy" class="w-3 h-3"></i></button>` : '';
-            
-            div.innerHTML = `${copyBtn}<div class="whitespace-pre-wrap">${text}</div>`;
+            // Simpele markdown-achtige rendering voor titels en lijsten
+            let formattedText = text
+                .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold mb-4 border-b pb-2">$1</h1>')
+                .replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold mt-6 mb-3 text-indigo-500">$1</h2>')
+                .replace(/^\d+\. (.*$)/gim, '<li class="ml-4 mb-2">$1</li>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-indigo-400 font-bold">$1</strong>')
+                .replace(/\n/g, '<br>');
+
+            div.innerHTML = `<div class="worksheet-content">${formattedText}</div>`;
             output.appendChild(div);
-            output.scrollTop = output.scrollHeight;
+            output.scrollTop = 0;
             lucide.createIcons();
         }
 
         function appendStatus(msg, classes) {
             const id = "status-" + Date.now();
-            const output = document.getElementById('chat-output');
             const div = document.createElement('div');
             div.id = id;
             div.className = "text-center text-xs font-bold uppercase tracking-widest " + classes;
             div.innerText = msg;
-            output.appendChild(div);
-            output.scrollTop = output.scrollHeight;
+            document.getElementById('chat-output').appendChild(div);
             return id;
-        }
-
-        function copyText(btn) {
-            const text = btn.nextElementSibling.innerText;
-            navigator.clipboard.writeText(text);
-            btn.innerHTML = '<i data-lucide="check" class="w-3 h-3 text-green-500"></i>';
-            lucide.createIcons();
-            setTimeout(() => { btn.innerHTML = '<i data-lucide="copy" class="w-3 h-3"></i>'; lucide.createIcons(); }, 2000);
         }
 
         function toggleTheme() {
