@@ -3,110 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-Learning Hub | Leer de Toekomst</title>
+    <title>AI Learning Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
-        }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.2s ease, border-color 0.2s ease;
-        }
-        .glass-card:hover {
-            transform: translateY(-5px);
-            border-color: #3b82f6;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f1a; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .subject-card:hover { border-color: #3b82f6; transform: translateY(-2px); transition: all 0.3s; }
     </style>
 </head>
 <body class="text-slate-200 min-h-screen">
 
-    <nav class="border-b border-slate-800 p-4 sticky top-0 bg-slate-900/80 backdrop-blur-md z-50">
+    <nav class="border-b border-white/5 p-4 sticky top-0 bg-slate-950/50 backdrop-blur-lg z-50">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <i data-lucide="cpu" class="text-blue-500"></i>
-                <span class="text-xl font-bold tracking-tight">AI<span class="text-blue-500">Learning</span></span>
+                <div class="bg-blue-600 p-1.5 rounded-lg">
+                    <i data-lucide="brain-circuit" class="text-white w-5 h-5"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight">AI<span class="text-blue-500">Learn</span></span>
             </div>
-            <div class="space-x-6 hidden md:flex">
-                <a href="#" class="hover:text-blue-400 transition">Cursussen</a>
-                <a href="#" class="hover:text-blue-400 transition">Projecten</a>
-                <a href="#" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition">Start Leren</a>
+            
+            <div class="flex items-center gap-4">
+                <div class="flex bg-slate-800 rounded-full p-1 border border-white/10">
+                    <button onclick="setLanguage('nl')" id="btn-nl" class="px-3 py-1 rounded-full text-xs font-bold transition-all bg-blue-600 text-white">NL</button>
+                    <button onclick="setLanguage('en')" id="btn-en" class="px-3 py-1 rounded-full text-xs font-bold transition-all text-slate-400">EN</button>
+                </div>
             </div>
         </div>
     </nav>
 
-    <header class="max-w-6xl mx-auto pt-20 pb-16 px-4 text-center">
-        <h1 class="text-5xl md:text-7xl font-extrabold mb-6 bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-            Beheers Artificial Intelligence
+    <header class="max-w-4xl mx-auto pt-16 pb-12 px-4 text-center">
+        <h1 id="hero-title" class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+            Leer sneller met <span class="text-blue-500">AI</span>
         </h1>
-        <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10">
-            Leer hoe je AI-modellen bouwt, begrijpt en inzet. Van de basis van Prompt Engineering tot diepe neurale netwerken.
+        <p id="hero-subtitle" class="text-slate-400 text-lg">
+            Kies een vak en start je persoonlijke leertraject ondersteund door kunstmatige intelligentie.
         </p>
-        <div class="flex flex-col md:flex-row justify-center gap-4">
-            <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 transition">
-                Begin nu gratis <i data-lucide="arrow-right" class="w-5 h-5"></i>
-            </button>
-            <button class="bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 px-8 rounded-xl transition">
-                Bekijk curriculum
-            </button>
-        </div>
     </header>
 
     <main class="max-w-6xl mx-auto px-4 pb-20">
-        <h2 class="text-2xl font-bold mb-8 flex items-center gap-2">
-            <i data-lucide="layers" class="text-blue-500"></i> Populaire Modules
-        </h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="glass-card p-6 rounded-2xl">
-                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
-                    <i data-lucide="message-square" class="text-blue-400"></i>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="subject-card glass p-8 rounded-3xl text-center cursor-pointer group">
+                <div class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition">
+                    <i data-lucide="code-2" class="text-blue-500 w-8 h-8"></i>
                 </div>
-                <h3 class="text-xl font-bold mb-2">Prompt Engineering</h3>
-                <p class="text-slate-400 mb-4">Leer hoe je de beste resultaten haalt uit LLM's zoals GPT-4 en Claude.</p>
-                <div class="flex justify-between items-center text-sm font-medium">
-                    <span class="text-emerald-400">Basis</span>
-                    <a href="#" class="text-blue-400 hover:underline">Starten &rarr;</a>
-                </div>
+                <h3 class="text-2xl font-bold mb-3" id="title-cs">Informatica</h3>
+                <p class="text-slate-400 mb-6 text-sm" id="desc-cs">Python, algoritmes en webdevelopment met hulp van AI.</p>
+                <button class="w-full py-3 rounded-xl bg-white/5 hover:bg-blue-600 transition font-semibold" id="btn-cs">Starten</button>
             </div>
 
-            <div class="glass-card p-6 rounded-2xl">
-                <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
-                    <i data-lucide="image" class="text-purple-400"></i>
+            <div class="subject-card glass p-8 rounded-3xl text-center cursor-pointer group">
+                <div class="w-16 h-16 bg-orange-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition">
+                    <i data-lucide="book-open-check" class="text-orange-500 w-8 h-8"></i>
                 </div>
-                <h3 class="text-xl font-bold mb-2">Generatieve Kunst</h3>
-                <p class="text-slate-400 mb-4">Ontdek de wereld van Stable Diffusion en Midjourney voor visuele content.</p>
-                <div class="flex justify-between items-center text-sm font-medium">
-                    <span class="text-emerald-400">Gemiddeld</span>
-                    <a href="#" class="text-blue-400 hover:underline">Starten &rarr;</a>
-                </div>
+                <h3 class="text-2xl font-bold mb-3" id="title-nl">Nederlands</h3>
+                <p class="text-slate-400 mb-6 text-sm" id="desc-nl">Verbeter je spelling, grammatica en tekstbegrip.</p>
+                <button class="w-full py-3 rounded-xl bg-white/5 hover:bg-orange-600 transition font-semibold" id="btn-nl-lang">Starten</button>
             </div>
 
-            <div class="glass-card p-6 rounded-2xl border-blue-500/50">
-                <div class="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mb-4">
-                    <i data-lucide="code" class="text-orange-400"></i>
+            <div class="subject-card glass p-8 rounded-3xl text-center cursor-pointer group">
+                <div class="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition">
+                    <i data-lucide="languages" class="text-emerald-500 w-8 h-8"></i>
                 </div>
-                <h3 class="text-xl font-bold mb-2">AI App Ontwikkeling</h3>
-                <p class="text-slate-400 mb-4">Bouw je eigen applicaties met de OpenAI API en LangChain.</p>
-                <div class="flex justify-between items-center text-sm font-medium">
-                    <span class="text-blue-400">Gevorderd</span>
-                    <a href="#" class="text-blue-400 hover:underline">Starten &rarr;</a>
-                </div>
+                <h3 class="text-2xl font-bold mb-3" id="title-en">Engels</h3>
+                <p class="text-slate-400 mb-6 text-sm" id="desc-en">Master de Engelse taal door interactieve AI-gesprekken.</p>
+                <button class="w-full py-3 rounded-xl bg-white/5 hover:bg-emerald-600 transition font-semibold" id="btn-en-lang">Starten</button>
             </div>
+
         </div>
     </main>
 
-    <footer class="border-t border-slate-800 py-10 text-center text-slate-500 text-sm">
-        <p>&copy; 2024 AI-Learning Hub. Gebouwd voor de toekomst.</p>
-    </footer>
-
     <script>
-      lucide.createIcons();
+        // Vertalingen data
+        const translations = {
+            nl: {
+                heroTitle: 'Leer sneller met <span class="text-blue-500">AI</span>',
+                heroSubtitle: 'Kies een vak en start je persoonlijke leertraject ondersteund door kunstmatige intelligentie.',
+                csTitle: 'Informatica',
+                csDesc: 'Python, algoritmes en webdevelopment met hulp van AI.',
+                nlTitle: 'Nederlands',
+                nlDesc: 'Verbeter je spelling, grammatica en tekstbegrip.',
+                enTitle: 'Engels',
+                enDesc: 'Master de Engelse taal door interactieve AI-gesprekken.',
+                btnLabel: 'Starten'
+            },
+            en: {
+                heroTitle: 'Learn faster with <span class="text-blue-500">AI</span>',
+                heroSubtitle: 'Choose a subject and start your personal learning journey supported by artificial intelligence.',
+                csTitle: 'Computer Science',
+                csDesc: 'Python, algorithms, and web development with AI assistance.',
+                nlTitle: 'Dutch',
+                nlDesc: 'Improve your spelling, grammar, and reading comprehension.',
+                enTitle: 'English',
+                enDesc: 'Master the English language through interactive AI conversations.',
+                btnLabel: 'Start Now'
+            }
+        };
+
+        function setLanguage(lang) {
+            const t = translations[lang];
+            
+            // Update teksten
+            document.getElementById('hero-title').innerHTML = t.heroTitle;
+            document.getElementById('hero-subtitle').innerText = t.heroSubtitle;
+            document.getElementById('title-cs').innerText = t.csTitle;
+            document.getElementById('desc-cs').innerText = t.csDesc;
+            document.getElementById('title-nl').innerText = t.nlTitle;
+            document.getElementById('desc-nl').innerText = t.nlDesc;
+            document.getElementById('title-en').innerText = t.enTitle;
+            document.getElementById('desc-en').innerText = t.enDesc;
+            
+            // Update alle knoppen
+            document.querySelectorAll('button[id^="btn-"]').forEach(btn => {
+                if(btn.id !== 'btn-nl' && btn.id !== 'btn-en') {
+                    btn.innerText = t.btnLabel;
+                }
+            });
+
+            // Update actieve knop styling in de switcher
+            document.getElementById('btn-nl').className = lang === 'nl' ? 'px-3 py-1 rounded-full text-xs font-bold transition-all bg-blue-600 text-white' : 'px-3 py-1 rounded-full text-xs font-bold transition-all text-slate-400';
+            document.getElementById('btn-en').className = lang === 'en' ? 'px-3 py-1 rounded-full text-xs font-bold transition-all bg-blue-600 text-white' : 'px-3 py-1 rounded-full text-xs font-bold transition-all text-slate-400';
+            
+            // HTML lang attribuut aanpassen
+            document.documentElement.lang = lang;
+        }
+
+        // Icons laden
+        lucide.createIcons();
     </script>
 </body>
 </html>
