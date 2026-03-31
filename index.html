@@ -1,157 +1,101 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Learning Platform</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        // Tailwind config voor dark mode support
-        tailwind.config = {
-            darkMode: 'class',
-        }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s, color 0.3s; }
-        .glass { backdrop-filter: blur(12px); border: 1px solid rgba(150, 150, 150, 0.1); }
-        .dark .glass { background: rgba(255, 255, 255, 0.03); }
-        .light .glass { background: rgba(0, 0, 0, 0.03); border: 1px solid rgba(0, 0, 0, 0.1); }
-    </style>
-</head>
-<body class="dark bg-slate-950 text-slate-200 min-h-screen">
+<style>
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
+    .modal.active { display: flex; }
+    .result-tag { background: #3b82f6; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-top: 4px; display: inline-block; }
+</style>
 
-    <nav class="border-b border-white/10 p-4 sticky top-0 bg-inherit backdrop-blur-lg z-50">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <div class="bg-blue-600 p-1.5 rounded-lg">
-                    <i data-lucide="brain-circuit" class="text-white w-5 h-5"></i>
-                </div>
-                <span class="text-xl font-bold tracking-tight dark:text-white text-slate-900">AI<span class="text-blue-500">Learn</span></span>
-            </div>
-            
-            <div class="flex items-center gap-4">
-                <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-slate-800/50 transition border border-white/10" id="theme-btn">
-                    <i data-lucide="sun" id="theme-icon-light" class="hidden w-5 h-5 text-yellow-500"></i>
-                    <i data-lucide="moon" id="theme-icon-dark" class="w-5 h-5 text-blue-400"></i>
-                </button>
-
-                <div class="flex bg-slate-800/50 dark:bg-slate-800 rounded-full p-1 border border-white/10">
-                    <button onclick="setLanguage('en')" id="lang-en" class="px-3 py-1 rounded-full text-xs font-bold transition-all bg-blue-600 text-white">EN</button>
-                    <button onclick="setLanguage('nl')" id="lang-nl" class="px-3 py-1 rounded-full text-xs font-bold transition-all text-slate-400">NL</button>
-                </div>
-            </div>
+<div id="analyzer-modal" class="modal p-4">
+    <div class="glass w-full max-w-2xl p-8 rounded-3xl shadow-2xl relative">
+        <button onclick="closeAnalyzer()" class="absolute top-4 right-4 text-slate-500 hover:text-white">
+            <i data-lucide="x"></i>
+        </button>
+        
+        <h2 class="text-2xl font-bold mb-4 dark:text-white text-slate-900">Zinsontleding AI</h2>
+        <p class="text-slate-400 mb-6 text-sm">Typ een Nederlandse zin en de AI splitst deze in zinsdelen.</p>
+        
+        <div class="flex gap-2 mb-6">
+            <input type="text" id="sentence-input" placeholder="Bijv: De jongen geeft de hond een koekje." 
+                   class="flex-1 bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition">
+            <button onclick="analyzeSentence()" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl font-bold transition">Analyseer</button>
         </div>
-    </nav>
 
-    <header class="max-w-4xl mx-auto pt-16 pb-12 px-4 text-center">
-        <h1 id="hero-title" class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight dark:text-white text-slate-900">
-            Learn faster with <span class="text-blue-500">AI</span>
-        </h1>
-        <p id="hero-subtitle" class="text-slate-500 dark:text-slate-400 text-lg">
-            Choose a subject and start your personal learning journey supported by artificial intelligence.
-        </p>
-    </header>
-
-    <main class="max-w-6xl mx-auto px-4 pb-20">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            <div class="glass p-8 rounded-3xl text-center group border hover:border-blue-500 transition-all duration-300">
-                <div class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <i data-lucide="code-2" class="text-blue-500 w-8 h-8"></i>
-                </div>
-                <h3 class="text-2xl font-bold mb-3 dark:text-white text-slate-900" id="title-cs">Computer Science</h3>
-                <p class="text-slate-500 dark:text-slate-400 mb-6 text-sm" id="desc-cs">Python, algorithms, and web development with AI assistance.</p>
-                <button class="w-full py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition font-semibold" id="btn-cs">Start</button>
+        <div id="analysis-result" class="space-y-4">
             </div>
+    </div>
+</div>
 
-            <div class="glass p-8 rounded-3xl text-center group border hover:border-orange-500 transition-all duration-300">
-                <div class="w-16 h-16 bg-orange-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <i data-lucide="book-open-check" class="text-orange-500 w-8 h-8"></i>
-                </div>
-                <h3 class="text-2xl font-bold mb-3 dark:text-white text-slate-900" id="title-nl">Dutch</h3>
-                <p class="text-slate-500 dark:text-slate-400 mb-6 text-sm" id="desc-nl">Improve your spelling, grammar, and reading comprehension.</p>
-                <button class="w-full py-3 rounded-xl bg-slate-200 dark:bg-white/5 dark:text-white text-slate-900 hover:bg-orange-500 hover:text-white transition font-semibold" id="btn-nl-action">Start</button>
-            </div>
+<script>
+// --- LOGICA VOOR ZINSONTLEDING ---
 
-            <div class="glass p-8 rounded-3xl text-center group border hover:border-emerald-500 transition-all duration-300">
-                <div class="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <i data-lucide="languages" class="text-emerald-500 w-8 h-8"></i>
-                </div>
-                <h3 class="text-2xl font-bold mb-3 dark:text-white text-slate-900" id="title-en">English</h3>
-                <p class="text-slate-500 dark:text-slate-400 mb-6 text-sm" id="desc-en">Master the English language through interactive AI conversations.</p>
-                <button class="w-full py-3 rounded-xl bg-slate-200 dark:bg-white/5 dark:text-white text-slate-900 hover:bg-emerald-600 hover:text-white transition font-semibold" id="btn-en-action">Start</button>
-            </div>
+// Koppel de "Start" knop van Nederlands aan de modal
+document.getElementById('btn-nl-action').onclick = function() {
+    document.getElementById('analyzer-modal').classList.add('active');
+};
 
-        </div>
-    </main>
+function closeAnalyzer() {
+    document.getElementById('analyzer-modal').classList.remove('active');
+}
 
-    <script>
-        const translations = {
-            en: {
-                heroTitle: 'Learn faster with <span class="text-blue-500">AI</span>',
-                heroSubtitle: 'Choose a subject and start your personal learning journey supported by artificial intelligence.',
-                csTitle: 'Computer Science',
-                csDesc: 'Python, algorithms, and web development with AI assistance.',
-                nlTitle: 'Dutch',
-                nlDesc: 'Improve your spelling, grammar, and reading comprehension.',
-                enTitle: 'English',
-                enDesc: 'Master the English language through interactive AI conversations.',
-                btnLabel: 'Start'
-            },
-            nl: {
-                heroTitle: 'Leer sneller met <span class="text-blue-500">AI</span>',
-                heroSubtitle: 'Kies een vak en start je persoonlijke leertraject ondersteund door kunstmatige intelligentie.',
-                csTitle: 'Informatica',
-                csDesc: 'Python, algoritmes en webdevelopment met hulp van AI.',
-                nlTitle: 'Nederlands',
-                nlDesc: 'Verbeter je spelling, grammatica en tekstbegrip.',
-                enTitle: 'Engels',
-                enDesc: 'Master de Engelse taal door interactieve AI-gesprekken.',
-                btnLabel: 'Starten'
-            }
-        };
+function analyzeSentence() {
+    const sentence = document.getElementById('sentence-input').value.trim();
+    if (!sentence) return;
 
-        function setLanguage(lang) {
-            const t = translations[lang];
-            document.getElementById('hero-title').innerHTML = t.heroTitle;
-            document.getElementById('hero-subtitle').innerText = t.heroSubtitle;
-            document.getElementById('title-cs').innerText = t.csTitle;
-            document.getElementById('desc-cs').innerText = t.csDesc;
-            document.getElementById('title-nl').innerText = t.nlTitle;
-            document.getElementById('desc-nl').innerText = t.nlDesc;
-            document.getElementById('title-en').innerText = t.enTitle;
-            document.getElementById('desc-en').innerText = t.enDesc;
-            
-            document.getElementById('btn-cs').innerText = t.btnLabel;
-            document.getElementById('btn-nl-action').innerText = t.btnLabel;
-            document.getElementById('btn-en-action').innerText = t.btnLabel;
+    const words = sentence.replace(/[.!?]/g, '').split(' ');
+    const resultDiv = document.getElementById('analysis-result');
+    resultDiv.innerHTML = '<div class="animate-pulse text-blue-400">Analyseren...</div>';
 
-            // UI Buttons
-            document.getElementById('lang-en').className = lang === 'en' ? 'px-3 py-1 rounded-full text-xs font-bold transition-all bg-blue-600 text-white' : 'px-3 py-1 rounded-full text-xs font-bold transition-all text-slate-400 hover:text-white';
-            document.getElementById('lang-nl').className = lang === 'nl' ? 'px-3 py-1 rounded-full text-xs font-bold transition-all bg-blue-600 text-white' : 'px-3 py-1 rounded-full text-xs font-bold transition-all text-slate-400 hover:text-white';
+    // Simuleer AI vertraging
+    setTimeout(() => {
+        const analysis = performParsing(words);
+        renderAnalysis(analysis, resultDiv);
+    }, 600);
+}
+
+function performParsing(words) {
+    // Simpele database voor de demo-logica
+    const articles = ['de', 'het', 'een', 'hetgeen'];
+    const verbs = ['loopt', 'geeft', 'is', 'werkt', 'leert', 'maakt', 'zwemt', 'leest'];
+    
+    let analysis = [];
+    let i = 0;
+
+    while (i < words.length) {
+        let part = { word: words[i], role: 'Onbekend' };
+        let lowerWord = words[i].toLowerCase();
+
+        // 1. Lidwoord + Zelfst. Naamwoord (Onderwerp/Object)
+        if (articles.includes(lowerWord) && i + 1 < words.length) {
+            part.word = words[i] + " " + words[i+1];
+            part.role = (i === 0) ? "Onderwerp (Subj.)" : "Lijdend Voorwerp (Obj.)";
+            i += 2;
+        } 
+        // 2. Werkwoorden (Persoonsvorm)
+        else if (verbs.includes(lowerWord)) {
+            part.role = "Persoonsvorm (PV)";
+            i++;
         }
-
-        function toggleTheme() {
-            const body = document.body;
-            const isDark = body.classList.contains('dark');
-            
-            if (isDark) {
-                body.classList.remove('dark', 'bg-slate-950', 'text-slate-200');
-                body.classList.add('light', 'bg-slate-50', 'text-slate-900');
-                document.getElementById('theme-icon-light').classList.remove('hidden');
-                document.getElementById('theme-icon-dark').classList.add('hidden');
-            } else {
-                body.classList.remove('light', 'bg-slate-50', 'text-slate-900');
-                body.classList.add('dark', 'bg-slate-950', 'text-slate-200');
-                document.getElementById('theme-icon-light').classList.add('hidden');
-                document.getElementById('theme-icon-dark').classList.remove('hidden');
-            }
+        // 3. Losse woorden
+        else {
+            part.role = "Zinsdeel";
+            i++;
         }
+        analysis.push(part);
+    }
+    return analysis;
+}
 
-        // Init
-        lucide.createIcons();
-    </script>
-</body>
-</html>
+function renderAnalysis(analysis, container) {
+    container.innerHTML = '<div class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>';
+    const grid = container.firstChild;
+
+    analysis.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'p-3 bg-white/5 rounded-xl border border-white/5';
+        card.innerHTML = `
+            <div class="text-lg font-semibold dark:text-white text-slate-900">${item.word}</div>
+            <div class="result-tag">${item.role}</div>
+        `;
+        grid.appendChild(card);
+    });
+}
+</script>
