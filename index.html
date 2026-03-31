@@ -3,112 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Learning Hub</title>
+    <title>AI Learning Hub | Gemini Powered</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        tailwind.config = { darkMode: 'class' }
-    </script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; }
         .glass { backdrop-filter: blur(12px); border: 1px solid rgba(150, 150, 150, 0.1); }
         .dark .glass { background: rgba(255, 255, 255, 0.03); }
-        .light .glass { background: rgba(0, 0, 0, 0.05); }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        .light .glass { background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.1); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
         .modal.active { display: flex; }
-        pre { white-space: pre-wrap; word-wrap: break-word; }
+        .chat-bubble { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="dark bg-slate-950 text-slate-200 min-h-screen">
 
     <nav class="border-b border-white/10 p-4 sticky top-0 bg-inherit backdrop-blur-lg z-50">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="location.reload()">
                 <div class="bg-blue-600 p-1.5 rounded-lg"><i data-lucide="sparkles" class="text-white w-5 h-5"></i></div>
-                <span class="text-xl font-bold dark:text-white text-slate-900">AI<span class="text-blue-500">Learn</span></span>
+                <span class="text-xl font-bold dark:text-white text-slate-900 tracking-tight">AI<span class="text-blue-500">Learn</span></span>
             </div>
             <div class="flex items-center gap-4">
-                <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-slate-800/50 border border-white/10">
+                <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-slate-800/50 border border-white/10 transition">
                     <i data-lucide="sun" id="sun-icon" class="hidden w-5 h-5 text-yellow-500"></i>
                     <i data-lucide="moon" id="moon-icon" class="w-5 h-5 text-blue-400"></i>
                 </button>
                 <div class="flex bg-slate-800/50 rounded-full p-1 border border-white/10">
-                    <button onclick="setLanguage('en')" id="lang-en" class="px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white">EN</button>
-                    <button onclick="setLanguage('nl')" id="lang-nl" class="px-3 py-1 rounded-full text-xs font-bold text-slate-400">NL</button>
+                    <button onclick="setLanguage('en')" id="lang-en" class="px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white transition-all">EN</button>
+                    <button onclick="setLanguage('nl')" id="lang-nl" class="px-3 py-1 rounded-full text-xs font-bold text-slate-400 transition-all">NL</button>
                 </div>
             </div>
         </div>
     </nav>
 
-    <header class="max-w-4xl mx-auto pt-12 pb-8 px-4 text-center">
-        <h1 id="hero-title" class="text-4xl md:text-6xl font-extrabold mb-4 dark:text-white text-slate-900">Learn with Gemini AI</h1>
-        <p id="hero-subtitle" class="text-slate-500 dark:text-slate-400 text-lg">Select a subject to start an interactive AI session.</p>
+    <header class="max-w-4xl mx-auto pt-16 pb-10 px-4 text-center">
+        <h1 id="hero-title" class="text-5xl md:text-7xl font-extrabold mb-6 dark:text-white text-slate-900 tracking-tight">Learn with Gemini AI</h1>
+        <p id="hero-subtitle" class="text-slate-500 dark:text-slate-400 text-lg md:text-xl max-w-2xl mx-auto">Master Informatics, Dutch, and English with your personal AI assistant.</p>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 pb-20 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div onclick="openApp('cs')" class="glass p-8 rounded-3xl cursor-pointer hover:border-blue-500 transition-all group">
-            <i data-lucide="code-2" class="text-blue-500 w-10 h-10 mb-4"></i>
-            <h3 class="text-2xl font-bold mb-2 dark:text-white text-slate-900" id="t-cs">Computer Science</h3>
-            <p class="text-sm text-slate-500" id="d-cs">Explain code, debug, or learn algorithms.</p>
+    <main class="max-w-6xl mx-auto px-4 pb-20 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div onclick="openApp('cs')" class="glass p-8 rounded-3xl cursor-pointer hover:border-blue-500 transition-all transform hover:-translate-y-2 group">
+            <div class="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="code-2" class="text-blue-500 w-8 h-8"></i></div>
+            <h3 class="text-2xl font-bold mb-3 dark:text-white text-slate-900" id="t-cs">Informatics</h3>
+            <p class="text-slate-500" id="d-cs">Explain code, debug, or learn data structures.</p>
         </div>
-        <div onclick="openApp('nl')" class="glass p-8 rounded-3xl cursor-pointer hover:border-orange-500 transition-all group">
-            <i data-lucide="book-open" class="text-orange-500 w-10 h-10 mb-4"></i>
-            <h3 class="text-2xl font-bold mb-2 dark:text-white text-slate-900" id="t-nl">Dutch</h3>
-            <p class="text-sm text-slate-500" id="d-nl">Sentence parsing and grammar check.</p>
+        <div onclick="openApp('nl')" class="glass p-8 rounded-3xl cursor-pointer hover:border-orange-500 transition-all transform hover:-translate-y-2 group">
+            <div class="w-14 h-14 bg-orange-500/10 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="book-open" class="text-orange-500 w-8 h-8"></i></div>
+            <h3 class="text-2xl font-bold mb-3 dark:text-white text-slate-900" id="t-nl">Dutch</h3>
+            <p class="text-slate-500" id="d-nl">Interactive sentence parsing and grammar guide.</p>
         </div>
-        <div onclick="openApp('en')" class="glass p-8 rounded-3xl cursor-pointer hover:border-emerald-500 transition-all group">
-            <i data-lucide="languages" class="text-emerald-500 w-10 h-10 mb-4"></i>
-            <h3 class="text-2xl font-bold mb-2 dark:text-white text-slate-900" id="t-en">English</h3>
-            <p class="text-sm text-slate-500" id="d-en">Translation and conversation practice.</p>
+        <div onclick="openApp('en')" class="glass p-8 rounded-3xl cursor-pointer hover:border-emerald-500 transition-all transform hover:-translate-y-2 group">
+            <div class="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="languages" class="text-emerald-500 w-8 h-8"></i></div>
+            <h3 class="text-2xl font-bold mb-3 dark:text-white text-slate-900" id="t-en">English</h3>
+            <p class="text-slate-500" id="d-en">Translations, writing help and conversation.</p>
         </div>
     </main>
 
     <div id="ai-modal" class="modal">
-        <div class="glass w-full max-w-3xl p-6 md:p-10 rounded-3xl relative max-h-[90vh] flex flex-col">
-            <button onclick="closeApp()" class="absolute top-6 right-6 text-slate-500 hover:text-red-500"><i data-lucide="x"></i></button>
-            <h2 id="modal-title" class="text-3xl font-bold mb-2 dark:text-white text-slate-900 italic">AI Assistant</h2>
-            <p id="modal-desc" class="text-slate-400 mb-6 border-b border-white/10 pb-4"></p>
-            
-            <div id="chat-output" class="flex-1 overflow-y-auto mb-4 space-y-4 text-sm leading-relaxed pr-2">
-                <div class="p-4 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400" id="welcome-msg">
-                    Waiting for your input...
+        <div class="glass w-full max-w-4xl p-6 md:p-10 rounded-[2rem] relative max-h-[90vh] flex flex-col shadow-2xl">
+            <button onclick="closeApp()" class="absolute top-6 right-6 text-slate-500 hover:text-white transition"><i data-lucide="x"></i></button>
+            <div class="flex items-center gap-3 mb-6">
+                <div id="modal-icon" class="p-2 bg-blue-500/20 rounded-lg text-blue-500"></div>
+                <div>
+                    <h2 id="modal-title" class="text-2xl font-bold dark:text-white text-slate-900">Assistant</h2>
+                    <p id="modal-desc" class="text-xs text-slate-500 uppercase tracking-widest font-bold"></p>
                 </div>
             </div>
+            
+            <div id="chat-output" class="flex-1 overflow-y-auto mb-6 space-y-6 pr-2 custom-scrollbar">
+                <div class="p-4 rounded-2xl bg-white/5 border border-white/5 text-slate-400 text-center italic">Ready for your question...</div>
+            </div>
 
-            <div class="flex gap-2">
-                <input type="text" id="user-input" placeholder="Type here..." 
-                       class="flex-1 bg-slate-900/50 border border-white/10 rounded-xl px-4 py-4 outline-none focus:border-blue-500 dark:text-white text-slate-900">
-                <button onclick="askGemini()" class="bg-blue-600 hover:bg-blue-700 px-6 rounded-xl font-bold transition flex items-center gap-2">
-                    <span>Send</span> <i data-lucide="send" class="w-4 h-4"></i>
+            <div class="flex gap-3 bg-slate-900/50 p-2 rounded-2xl border border-white/10">
+                <input type="text" id="user-input" onkeypress="if(event.key==='Enter') askGemini()" placeholder="Ask anything..." 
+                       class="flex-1 bg-transparent border-none rounded-xl px-4 py-3 outline-none dark:text-white text-slate-900">
+                <button onclick="askGemini()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition flex items-center gap-2">
+                    <span class="hidden md:block">Ask AI</span> <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        const API_KEY = "AIzaSyDfJ-SSBSZ3ArpmNuw5MszfvBYUI0DIuUg";
+        const API_KEYS = [
+            "AIzaSyD_yJLr9KjIEOZxU-uyyLDHwa1EvsYtSCU",
+            "AIzaSyAiFTZSRA2fTJhm39cX2qUjxyxRTY89LMA",
+            "AIzaSyDfJ-SSBSZ3ArpmNuw5MszfvBYUI0DIuUg"
+        ];
+        
+        let blockedKeys = new Set();
         let currentSubject = '';
         let currentLang = 'en';
 
         const content = {
             en: {
-                heroH: "Learn with Gemini AI", heroP: "Select a subject to start an interactive AI session.",
-                csH: "Computer Science", csD: "Explain code, debug, or learn algorithms.",
-                nlH: "Dutch", nlD: "Sentence parsing and grammar check.",
-                enH: "English", enD: "Translation and conversation practice.",
-                prompt_cs: "You are a Computer Science teacher. Explain this code or concept simply: ",
-                prompt_nl: "Jij bent een docent Nederlands. Ontleed deze zin volledig (zinsdelen benoemen) of leg de grammatica uit: ",
-                prompt_en: "You are an English teacher. Help the user with this English text or translate: "
+                heroH: "Learn with Gemini AI", heroP: "Master Informatics, Dutch, and English with your personal AI assistant.",
+                csH: "Informatics", csD: "Explain code, debug, or learn data structures.",
+                nlH: "Dutch", nlD: "Interactive sentence parsing and grammar guide.",
+                enH: "English", enD: "Translations, writing help and conversation.",
+                prompt_cs: "You are an Informatics teacher. Explain this code or computer science concept simply. Use code blocks if needed: ",
+                prompt_nl: "Jij bent een docent Nederlands. Ontleed de ingevoerde zin volledig (zinsdelen benoemen) of leg de grammatica uit. Wees duidelijk en formeel: ",
+                prompt_en: "You are an English teacher. Help the user with English grammar, translations, or practice a conversation: "
             },
             nl: {
-                heroH: "Leer met Gemini AI", heroP: "Kies een vak om een interactieve AI-sessie te starten.",
+                heroH: "Leer met Gemini AI", heroP: "Beheers Informatica, Nederlands en Engels met jouw persoonlijke AI-assistent.",
                 csH: "Informatica", csD: "Code uitleggen, debuggen of algoritmes leren.",
-                nlH: "Nederlands", nlD: "Zinsontleding en grammatica controle.",
-                enH: "Engels", enD: "Vertalingen en gespreksoefeningen.",
-                prompt_cs: "Je bent een docent Informatica. Leg deze code of dit concept simpel uit: ",
-                prompt_nl: "Jij bent een docent Nederlands. Ontleed deze zin volledig (zinsdelen benoemen) of leg de grammatica uit: ",
-                prompt_en: "You are an English teacher. Help the user with this English text or translate: "
+                nlH: "Nederlands", nlD: "Interactieve zinsontleding en grammatica hulp.",
+                enH: "Engels", enD: "Vertalingen, hulp bij schrijven en gesprekken.",
+                prompt_cs: "Je bent een docent Informatica. Leg deze code of dit concept simpel uit. Gebruik codeblokken waar nodig: ",
+                prompt_nl: "Jij bent een docent Nederlands. Ontleed deze zin volledig (zinsdelen benoemen zoals PV, Onderwerp, etc.) of leg de grammatica uit: ",
+                prompt_en: "Je bent een docent Engels. Help de gebruiker met grammatica, vertalingen of oefen een gesprek: "
             }
         };
 
@@ -120,67 +128,111 @@
             document.getElementById('t-cs').innerText = c.csH; document.getElementById('d-cs').innerText = c.csD;
             document.getElementById('t-nl').innerText = c.nlH; document.getElementById('d-nl').innerText = c.nlD;
             document.getElementById('t-en').innerText = c.enH; document.getElementById('d-en').innerText = c.enD;
-            
-            document.getElementById('lang-en').className = l === 'en' ? 'px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white' : 'px-3 py-1 rounded-full text-xs font-bold text-slate-400';
-            document.getElementById('lang-nl').className = l === 'nl' ? 'px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white' : 'px-3 py-1 rounded-full text-xs font-bold text-slate-400';
+            document.getElementById('lang-en').className = l === 'en' ? 'px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white transition-all' : 'px-3 py-1 rounded-full text-xs font-bold text-slate-400 transition-all';
+            document.getElementById('lang-nl').className = l === 'nl' ? 'px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white transition-all' : 'px-3 py-1 rounded-full text-xs font-bold text-slate-400 transition-all';
         }
 
         function openApp(subject) {
             currentSubject = subject;
             document.getElementById('modal-title').innerText = content[currentLang][subject + 'H'];
-            document.getElementById('modal-desc').innerText = content[currentLang][subject + 'D'];
+            document.getElementById('modal-desc').innerText = subject;
+            const icons = { cs: 'code-2', nl: 'book-open', en: 'languages' };
+            document.getElementById('modal-icon').innerHTML = `<i data-lucide="${icons[subject]}"></i>`;
             document.getElementById('ai-modal').classList.add('active');
             document.getElementById('chat-output').innerHTML = '';
+            lucide.createIcons();
         }
 
         function closeApp() { document.getElementById('ai-modal').classList.remove('active'); }
 
-        async function askGemini() {
+        async function askGemini(retryCount = 0, manualText = null) {
             const input = document.getElementById('user-input');
             const output = document.getElementById('chat-output');
-            const text = input.value.trim();
+            const text = manualText || input.value.trim();
             if(!text) return;
 
-            const userMsg = document.createElement('div');
-            userMsg.className = "p-3 bg-white/5 rounded-xl border border-white/10 ml-8 text-right";
-            userMsg.innerText = text;
-            output.appendChild(userMsg);
-            input.value = '';
+            if(retryCount === 0) {
+                appendMessage('user', text);
+                input.value = '';
+            }
 
-            const loading = document.createElement('div');
-            loading.innerText = "...Thinking...";
-            output.appendChild(loading);
+            const availableKeys = API_KEYS.filter(k => !blockedKeys.has(k));
+            if(availableKeys.length === 0) {
+                const waitId = appendStatus("All systems busy. Retrying in 5s...", "text-orange-500");
+                setTimeout(() => { document.getElementById(waitId).remove(); askGemini(retryCount + 1, text); }, 5000);
+                return;
+            }
+
+            const selectedKey = availableKeys[Math.floor(Math.random() * availableKeys.length)];
+            const loadingId = appendStatus("Gemini is thinking...", "text-blue-400 animate-pulse");
 
             try {
                 const prompt = content[currentLang]['prompt_' + currentSubject] + text;
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${selectedKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
                 
                 const data = await response.json();
-                loading.remove();
-                
-                const aiMsg = document.createElement('div');
-                aiMsg.className = "p-4 bg-blue-600/10 border border-blue-500/20 rounded-xl mr-8 text-slate-300";
-                aiMsg.innerText = data.candidates[0].content.parts[0].text;
-                output.appendChild(aiMsg);
-                output.scrollTop = output.scrollHeight;
+                document.getElementById(loadingId).remove();
+
+                if (response.status === 429) {
+                    blockedKeys.add(selectedKey);
+                    setTimeout(() => blockedKeys.delete(selectedKey), 60000);
+                    throw new Error("Limit");
+                }
+
+                const aiResponse = data.candidates[0].content.parts[0].text;
+                appendMessage('ai', aiResponse);
 
             } catch (e) {
-                loading.innerText = "Error: API limit or Key issue.";
+                if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
+                if(retryCount < 3) {
+                    askGemini(retryCount + 1, text);
+                } else {
+                    appendStatus("Server busy. Try again later.", "text-red-500");
+                }
             }
         }
 
+        function appendMessage(sender, text) {
+            const output = document.getElementById('chat-output');
+            const div = document.createElement('div');
+            div.className = sender === 'user' ? "chat-bubble p-4 bg-white/5 border border-white/10 rounded-2xl ml-12 text-right" : "chat-bubble p-5 bg-blue-600/10 border border-blue-500/20 rounded-2xl mr-12 relative group";
+            
+            const copyBtn = sender === 'ai' ? `<button onclick="copyText(this)" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition p-1 bg-slate-800 rounded text-slate-400 hover:text-white"><i data-lucide="copy" class="w-3 h-3"></i></button>` : '';
+            
+            div.innerHTML = `${copyBtn}<div class="whitespace-pre-wrap">${text}</div>`;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+            lucide.createIcons();
+        }
+
+        function appendStatus(msg, classes) {
+            const id = "status-" + Date.now();
+            const output = document.getElementById('chat-output');
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = "text-center text-xs font-bold uppercase tracking-widest " + classes;
+            div.innerText = msg;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+            return id;
+        }
+
+        function copyText(btn) {
+            const text = btn.nextElementSibling.innerText;
+            navigator.clipboard.writeText(text);
+            btn.innerHTML = '<i data-lucide="check" class="w-3 h-3 text-green-500"></i>';
+            lucide.createIcons();
+            setTimeout(() => { btn.innerHTML = '<i data-lucide="copy" class="w-3 h-3"></i>'; lucide.createIcons(); }, 2000);
+        }
+
         function toggleTheme() {
-            const b = document.body;
-            b.classList.toggle('dark');
-            const isDark = b.classList.contains('dark');
-            b.classList.toggle('bg-slate-950', isDark);
-            b.classList.toggle('text-slate-200', isDark);
-            b.classList.toggle('bg-slate-50', !isDark);
-            b.classList.toggle('text-slate-900', !isDark);
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            document.body.className = isDark ? 'dark bg-slate-950 text-slate-200 min-h-screen' : 'light bg-slate-50 text-slate-900 min-h-screen';
             document.getElementById('sun-icon').classList.toggle('hidden', isDark);
             document.getElementById('moon-icon').classList.toggle('hidden', !isDark);
         }
