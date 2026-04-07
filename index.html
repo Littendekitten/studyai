@@ -1,101 +1,309 @@
-<div class="flex bg-slate-800/50 rounded-xl p-1 mb-6 no-print w-fit mx-auto border border-white/10">
-    <button onclick="setMode('worksheet')" id="mode-ws" class="px-4 py-2 rounded-lg text-sm font-bold bg-indigo-600 text-white transition-all flex items-center gap-2">
-        <i data-lucide="file-text" class="w-4 h-4"></i> Worksheet
-    </button>
-    <button onclick="setMode('learning')" id="mode-lr" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-400 transition-all flex items-center gap-2">
-        <i data-lucide="graduation-cap" class="w-4 h-4"></i> Learning Mode
-    </button>
-</div>
-
-<script>
-    let currentMode = 'worksheet'; // Standaard modus
-    let chatHistory = []; // Voor de Learning Mode om context te onthouden
-
-    function setMode(mode) {
-        currentMode = mode;
-        const wsBtn = document.getElementById('mode-ws');
-        const lrBtn = document.getElementById('mode-lr');
-        const welcome = document.getElementById('welcome-box');
-
-        if(mode === 'learning') {
-            lrBtn.className = "px-4 py-2 rounded-lg text-sm font-bold bg-indigo-600 text-white transition-all flex items-center gap-2";
-            wsBtn.className = "px-4 py-2 rounded-lg text-sm font-bold text-slate-400 transition-all flex items-center gap-2";
-            welcome.innerText = currentLang === 'nl' ? "Learning Mode: Typ een onderwerp en ik ga je overhoren!" : "Learning Mode: Type a topic and I will quiz you!";
-        } else {
-            wsBtn.className = "px-4 py-2 rounded-lg text-sm font-bold bg-indigo-600 text-white transition-all flex items-center gap-2";
-            lrBtn.className = "px-4 py-2 rounded-lg text-sm font-bold text-slate-400 transition-all flex items-center gap-2";
-            welcome.innerText = currentLang === 'nl' ? "Typ een onderwerp waar je een werkblad over wilt..." : "Type a topic for your worksheet...";
-        }
-        document.getElementById('chat-output').innerHTML = '';
-        chatHistory = []; // Reset geschiedenis bij mode-switch
-    }
-
-    async function askGemini(retryCount = 0) {
-        const input = document.getElementById('user-input');
-        const output = document.getElementById('chat-output');
-        const text = input.value.trim();
-        if(!text) return;
-
-        // In Learning Mode laten we het gesprek staan, in Worksheet Mode maken we het leeg
-        if(currentMode === 'worksheet' && retryCount === 0) output.innerHTML = '';
-        if(currentMode === 'learning' && retryCount === 0) appendMessage('user', text);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyAI | Your Interactive AI Tutor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.3s ease; scroll-behavior: smooth; }
+        .glass { backdrop-filter: blur(16px); border: 1px solid rgba(150, 150, 150, 0.1); }
+        .dark .glass { background: rgba(15, 23, 42, 0.6); }
+        .light .glass { background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.05); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s ease; }
+        .modal.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
         
-        input.value = '';
+        @media print {
+            nav, header, .no-print, .mode-switcher, button { display: none !important; }
+            .modal { position: absolute; display: block; background: white; color: black; padding: 0; inset: 0; }
+            .glass { border: none; background: white; box-shadow: none; }
+            #chat-output { height: auto !important; overflow: visible !important; }
+            .chat-bubble { border: 1px solid #eee; page-break-inside: avoid; color: black !important; background: white !important; }
+        }
+    </style>
+</head>
+<body class="dark bg-slate-950 text-slate-200 min-h-screen">
 
-        const availableKeys = API_KEYS.filter(k => !blockedKeys.has(k));
-        const selectedKey = availableKeys[Math.floor(Math.random() * availableKeys.length)];
-        const loadingId = appendStatus(currentLang === 'nl' ? "AI denkt na..." : "AI is thinking...", "text-indigo-400 animate-pulse no-print");
+    <nav class="border-b border-white/10 p-4 sticky top-0 bg-slate-950/50 backdrop-blur-xl z-50 no-print">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer group" onclick="location.reload()">
+                <div class="bg-indigo-600 p-2 rounded-xl group-hover:scale-110 transition"><i data-lucide="graduation-cap" class="text-white w-6 h-6"></i></div>
+                <span class="text-2xl font-bold dark:text-white text-slate-900 tracking-tighter">Study<span class="text-indigo-500">AI</span></span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="toggleTheme()" class="p-2.5 rounded-xl hover:bg-slate-800/50 border border-white/10 transition">
+                    <i data-lucide="sun" id="sun-icon" class="hidden w-5 h-5 text-yellow-400"></i>
+                    <i data-lucide="moon" id="moon-icon" class="w-5 h-5 text-indigo-400"></i>
+                </button>
+                <div class="flex bg-slate-900/50 rounded-xl p-1 border border-white/10">
+                    <button onclick="setLanguage('en')" id="lang-en" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition-all">EN</button>
+                    <button onclick="setLanguage('nl')" id="lang-nl" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 transition-all">NL</button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-        try {
-            let prompt = "";
-            if(currentMode === 'worksheet') {
-                prompt = content[currentLang]['prompt_' + currentSubject] + text;
-            } else {
-                // De "Learning Mode" Prompt instructie
-                prompt = `You are a personal tutor for ${currentSubject}. 
-                If this is the first message, start by asking 1 challenging question about "${text}". 
-                If the user answers a question, check if it is correct. 
-                If correct: explain why and ask the next question. 
-                If wrong: give a subtle hint (don't give the answer yet) and let them try again. 
-                Keep it interactive and one question at a time. Language: ${currentLang}.
-                Context so far: ${JSON.stringify(chatHistory)}`;
+    <header class="max-w-4xl mx-auto pt-20 pb-12 px-4 text-center no-print">
+        <div class="inline-block px-4 py-1.5 mb-6 text-sm font-semibold text-indigo-400 bg-indigo-500/10 rounded-full border border-indigo-500/20">
+            Powered by Gemini 1.5 Flash
+        </div>
+        <h1 id="hero-title" class="text-5xl md:text-7xl font-extrabold mb-6 dark:text-white text-slate-900 tracking-tight">Level Up Your Learning</h1>
+        <p id="hero-subtitle" class="text-slate-500 dark:text-slate-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">Choose a subject to generate professional worksheets or start an interactive tutoring session with AI.</p>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 pb-24 grid grid-cols-1 md:grid-cols-3 gap-8 no-print">
+        <div onclick="openApp('cs')" class="glass p-10 rounded-[2.5rem] cursor-pointer hover:border-indigo-500/50 transition-all transform hover:-translate-y-3 group shadow-2xl shadow-indigo-500/5">
+            <div class="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mb-8 group-hover:rotate-12 transition"><i data-lucide="binary" class="text-indigo-500 w-8 h-8"></i></div>
+            <h3 class="text-2xl font-bold mb-3 dark:text-white text-slate-900" id="t-cs">Informatics</h3>
+            <p class="text-slate-500 leading-relaxed" id="d-cs">Algorithm visualization, Python challenges, and code debugging.</p>
+        </div>
+        <div onclick="openApp('nl')" class="glass p-10 rounded-[2.5rem] cursor-pointer hover:border-orange-500/50 transition-all transform hover:-translate-y-3 group shadow-2xl shadow-orange-500/5">
+            <div class="w-16 h-16 bg-orange-500/10 rounded-2xl flex items-center justify-center mb-8 group-hover:rotate-12 transition"><i data-lucide="pen-tool" class="text-orange-500 w-8 h-8"></i></div>
+            <h3 class="text-2xl font-bold mb-3 dark:text-white text-slate-900" id="t-nl">Dutch</h3>
+            <p class="text-slate-500 leading-relaxed" id="d-nl">Master spelling (dt-rules), sentence parsing, and literature analysis.</p>
+        </div>
+        <div onclick="openApp('en')" class="glass p-10 rounded-[2.5rem] cursor-pointer hover:border-emerald-500/50 transition-all transform hover:-translate-y-3 group shadow-2xl shadow-emerald-500/5">
+            <div class="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-8 group-hover:rotate-12 transition"><i data-lucide="languages" class="text-emerald-500 w-8 h-8"></i></div>
+            <h3 class="text-2xl font-bold mb-3 dark:text-white text-slate-900" id="t-en">English</h3>
+            <p class="text-slate-500 leading-relaxed" id="d-en">Vocabulary expansion, grammar drills, and speaking practice.</p>
+        </div>
+    </main>
+
+    <div id="ai-modal" class="modal">
+        <div class="glass w-full max-w-5xl p-6 md:p-8 rounded-[3rem] relative max-h-[92vh] flex flex-col shadow-3xl overflow-hidden border-white/20">
+            
+            <div class="flex justify-between items-center mb-6 no-print border-b border-white/10 pb-4">
+                <div class="flex items-center gap-4">
+                    <div id="modal-icon" class="p-3 bg-indigo-500/20 rounded-2xl text-indigo-500"></div>
+                    <div>
+                        <h2 id="modal-title" class="text-2xl font-bold dark:text-white text-slate-900">Study Assistant</h2>
+                        <div id="score-display" class="hidden text-xs font-bold text-indigo-400 uppercase tracking-widest mt-1">Score: 0</div>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex bg-slate-900/50 rounded-xl p-1 border border-white/10 mode-switcher">
+                    <button onclick="setMode('worksheet')" id="mode-ws" class="px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white transition-all flex items-center gap-2">
+                        <i data-lucide="file-text" class="w-4 h-4"></i> Worksheet
+                    </button>
+                    <button onclick="setMode('learning')" id="mode-lr" class="px-4 py-2 rounded-lg text-xs font-bold text-slate-400 transition-all flex items-center gap-2">
+                        <i data-lucide="zap" class="w-4 h-4"></i> Learning Mode
+                    </button>
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="print-btn" onclick="window.print()" class="p-2.5 bg-slate-800 rounded-xl hover:bg-slate-700 text-white transition border border-white/10"><i data-lucide="printer" class="w-5 h-5"></i></button>
+                    <button onclick="closeApp()" class="p-2.5 text-slate-500 hover:text-red-500 transition"><i data-lucide="x-circle" class="w-6 h-6"></i></button>
+                </div>
+            </div>
+            
+            <div id="chat-output" class="flex-1 overflow-y-auto mb-6 space-y-6 pr-4 custom-scrollbar">
+                <div id="welcome-msg" class="h-full flex flex-col items-center justify-center text-center p-10 opacity-50">
+                    <i data-lucide="sparkles" class="w-12 h-12 mb-4 text-indigo-500"></i>
+                    <p class="text-lg font-medium" id="welcome-text">Type a topic to get started!</p>
+                </div>
+            </div>
+
+            <div class="flex gap-3 bg-slate-900/80 p-3 rounded-[2rem] border border-indigo-500/20 shadow-inner no-print">
+                <input type="text" id="user-input" onkeypress="if(event.key==='Enter') askGemini()" placeholder="What do you want to learn?..." 
+                       class="flex-1 bg-transparent border-none rounded-xl px-5 py-3 outline-none dark:text-white text-slate-900 text-lg">
+                <button onclick="askGemini()" id="send-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-2xl font-bold transition-all flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+                    <span id="btn-text">Generate</span> <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_KEYS = [
+            "AIzaSyD_yJLr9KjIEOZxU-uyyLDHwa1EvsYtSCU",
+            "AIzaSyAiFTZSRA2fTJhm39cX2qUjxyxRTY89LMA",
+            "AIzaSyDfJ-SSBSZ3ArpmNuw5MszfvBYUI0DIuUg"
+        ];
+        
+        let blockedKeys = new Set();
+        let currentSubject = '';
+        let currentLang = 'en';
+        let currentMode = 'worksheet';
+        let chatHistory = [];
+        let score = 0;
+
+        const content = {
+            en: {
+                heroH: "Level Up Your Learning", heroP: "Master Informatics, Dutch, and English with your personal AI assistant.",
+                csH: "Informatics", csD: "Algorithm visualization, Python challenges, and code debugging.",
+                nlH: "Dutch", nlD: "Master spelling (dt-rules), sentence parsing, and literature analysis.",
+                enH: "English", enD: "Vocabulary expansion, grammar drills, and speaking practice.",
+                welcome: "Type a topic for your worksheet...", welcomeLR: "Learning Mode: Tell me what you want to practice and I'll quiz you!",
+                btnGen: "Generate", btnAsk: "Ask",
+                prompt_cs: "Create a professional Informatics worksheet. Include explanation, 5 exercises, and an answer key at the bottom. Topic: ",
+                prompt_nl: "Maak een professioneel werkblad Nederlands met uitleg, 10 oefeningen en antwoordsleutel onderaan. Onderwerp: ",
+                prompt_en: "Create a professional English worksheet with theory, vocabulary/grammar tasks, and answer key at the bottom. Topic: "
+            },
+            nl: {
+                heroH: "Verbeter Je Prestaties", heroP: "Beheers Informatica, Nederlands en Engels met jouw persoonlijke StudyAI assistent.",
+                csH: "Informatica", csD: "Python uitdagingen, algoritmes en hulp bij programmeren.",
+                nlH: "Nederlands", nlD: "Focus op spelling (dt), ontleden en tekstbegrip.",
+                enH: "Engels", enD: "Woordenschat, grammatica en gespreksoefeningen.",
+                welcome: "Typ een onderwerp voor je werkblad...", welcomeLR: "Learning Mode: Vertel me wat je wilt oefenen en ik overhoor je!",
+                btnGen: "Maak", btnAsk: "Vraag",
+                prompt_cs: "Maak een professioneel werkblad Informatica. Gebruik codeblokken. Inclusief uitleg, 5 opdrachten en antwoorden onderaan. Onderwerp: ",
+                prompt_nl: "Maak een professioneel werkblad Nederlands met uitleg, 10 oefeningen en antwoordsleutel onderaan. Onderwerp: ",
+                prompt_en: "Maak een professioneel werkblad Engels met theorie, oefenvragen en antwoordsleutel onderaan. Onderwerp: "
+            }
+        };
+
+        function setLanguage(l) {
+            currentLang = l;
+            const c = content[l];
+            document.getElementById('hero-title').innerText = c.heroH;
+            document.getElementById('hero-subtitle').innerText = c.heroP;
+            document.getElementById('t-cs').innerText = c.csH; document.getElementById('d-cs').innerText = c.csD;
+            document.getElementById('t-nl').innerText = c.nlH; document.getElementById('d-nl').innerText = c.nlD;
+            document.getElementById('t-en').innerText = c.enH; document.getElementById('d-en').innerText = c.enD;
+            document.getElementById('welcome-text').innerText = currentMode === 'learning' ? c.welcomeLR : c.welcome;
+            document.getElementById('btn-text').innerText = currentMode === 'learning' ? c.btnAsk : c.btnGen;
+            
+            document.getElementById('lang-en').className = l === 'en' ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white' : 'px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400';
+            document.getElementById('lang-nl').className = l === 'nl' ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white' : 'px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400';
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('mode-ws').className = mode === 'worksheet' ? "px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white transition-all flex items-center gap-2" : "px-4 py-2 rounded-lg text-xs font-bold text-slate-400 transition-all flex items-center gap-2";
+            document.getElementById('mode-lr').className = mode === 'learning' ? "px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white transition-all flex items-center gap-2" : "px-4 py-2 rounded-lg text-xs font-bold text-slate-400 transition-all flex items-center gap-2";
+            document.getElementById('btn-text').innerText = mode === 'learning' ? content[currentLang].btnAsk : content[currentLang].btnGen;
+            document.getElementById('welcome-text').innerText = mode === 'learning' ? content[currentLang].welcomeLR : content[currentLang].welcome;
+            document.getElementById('score-display').classList.toggle('hidden', mode !== 'learning');
+            document.getElementById('print-btn').classList.toggle('hidden', mode !== 'worksheet');
+            document.getElementById('chat-output').innerHTML = '';
+            chatHistory = [];
+            score = 0;
+            updateScore(0);
+        }
+
+        function openApp(subject) {
+            currentSubject = subject;
+            document.getElementById('modal-title').innerText = content[currentLang][subject + 'H'];
+            const icons = { cs: 'binary', nl: 'pen-tool', en: 'languages' };
+            document.getElementById('modal-icon').innerHTML = `<i data-lucide="${icons[subject]}"></i>`;
+            document.getElementById('ai-modal').classList.add('active');
+            lucide.createIcons();
+            setMode('worksheet');
+        }
+
+        function closeApp() { document.getElementById('ai-modal').classList.remove('active'); }
+
+        async function askGemini(retryCount = 0, manualText = null) {
+            const input = document.getElementById('user-input');
+            const output = document.getElementById('chat-output');
+            const text = manualText || input.value.trim();
+            if(!text) return;
+
+            if(currentMode === 'worksheet' && retryCount === 0) output.innerHTML = '';
+            if(currentMode === 'learning' && retryCount === 0) appendMessage('user', text);
+            input.value = '';
+
+            const availableKeys = API_KEYS.filter(k => !blockedKeys.has(k));
+            if(availableKeys.length === 0) {
+                appendStatus("System busy. Retrying in 5s...", "text-orange-500");
+                setTimeout(() => askGemini(retryCount + 1, text), 5000);
+                return;
             }
 
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${selectedKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt + " (User input: " + text + ")" }] }] })
-            });
-            
-            const data = await response.json();
-            document.getElementById(loadingId).remove();
+            const selectedKey = availableKeys[Math.floor(Math.random() * availableKeys.length)];
+            const loadingId = appendStatus("Thinking...", "text-indigo-400 animate-pulse no-print");
 
-            const aiResponse = data.candidates[0].content.parts[0].text;
-            
-            if(currentMode === 'worksheet') {
-                renderWorksheet(aiResponse);
-            } else {
-                appendMessage('ai', aiResponse);
-                chatHistory.push({user: text, ai: aiResponse}); // Onthoud de chat voor context
-                if(chatHistory.length > 10) chatHistory.shift(); // Beperk geheugen voor snelheid
+            try {
+                let finalPrompt = "";
+                if(currentMode === 'worksheet') {
+                    finalPrompt = content[currentLang]['prompt_' + currentSubject] + text;
+                } else {
+                    finalPrompt = `Role: Interactive Tutor for ${currentSubject}. Mode: Learning. 
+                    If first message: Ask 1 short question about "${text}". 
+                    If user answers: Validate. If correct, add "+1 Point" to your response text and ask next question. 
+                    If wrong, give a hint. Stay in language: ${currentLang}. History: ${JSON.stringify(chatHistory.slice(-5))}. User Input: ${text}`;
+                }
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${selectedKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: finalPrompt }] }] })
+                });
+                
+                const data = await response.json();
+                document.getElementById(loadingId).remove();
+
+                if (response.status === 429) {
+                    blockedKeys.add(selectedKey);
+                    setTimeout(() => blockedKeys.delete(selectedKey), 60000);
+                    throw new Error("Limit");
+                }
+
+                const aiText = data.candidates[0].content.parts[0].text;
+                if(aiText.includes("+1 Point")) updateScore(1);
+
+                if(currentMode === 'worksheet') renderWorksheet(aiText);
+                else {
+                    appendMessage('ai', aiText);
+                    chatHistory.push({u: text, ai: aiText});
+                }
+
+            } catch (e) {
+                if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
+                if(retryCount < 3) askGemini(retryCount + 1, text);
             }
-
-        } catch (e) {
-            if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
-            appendStatus("Error. Check je internet of API-keys.", "text-red-500");
         }
-    }
 
-    // Helper om berichten toe te voegen in Learning Mode
-    function appendMessage(sender, text) {
-        const output = document.getElementById('chat-output');
-        const div = document.createElement('div');
-        div.className = sender === 'user' 
-            ? "p-4 bg-indigo-600/20 border border-indigo-500/30 rounded-2xl ml-auto max-w-[80%] text-right mb-4" 
-            : "p-4 bg-white/5 border border-white/10 rounded-2xl mr-auto max-w-[80%] mb-4";
-        
-        div.innerHTML = `<div class="text-sm">${text.replace(/\n/g, '<br>')}</div>`;
-        output.appendChild(div);
-        output.scrollTop = output.scrollHeight;
-    }
-</script>
+        function renderWorksheet(text) {
+            const div = document.createElement('div');
+            div.className = "p-10 bg-white dark:bg-slate-900 rounded-3xl border border-white/10 text-slate-800 dark:text-slate-200 leading-relaxed shadow-2xl";
+            let html = text.replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold mb-6 border-b pb-4 text-indigo-500">$1</h1>')
+                           .replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold mt-8 mb-4">$1</h2>')
+                           .replace(/\*\*(.*?)\*\*/g, '<b class="text-indigo-500">$1</b>')
+                           .replace(/\n/g, '<br>');
+            div.innerHTML = html;
+            document.getElementById('chat-output').appendChild(div);
+        }
+
+        function appendMessage(sender, text) {
+            const output = document.getElementById('chat-output');
+            const div = document.createElement('div');
+            div.className = sender === 'user' ? "p-4 bg-indigo-600/10 border border-indigo-500/20 rounded-2xl ml-auto max-w-[80%] text-right" : "p-5 bg-white/5 border border-white/10 rounded-2xl mr-auto max-w-[85%] leading-relaxed";
+            div.innerHTML = `<div class="text-sm">${text.replace(/\n/g, '<br>')}</div>`;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function updateScore(pts) {
+            score += pts;
+            document.getElementById('score-display').innerText = `Score: ${score}`;
+        }
+
+        function appendStatus(msg, classes) {
+            const id = "s-" + Date.now();
+            const div = document.createElement('div');
+            div.id = id; div.className = "text-center text-[10px] font-bold uppercase tracking-[0.2em] " + classes;
+            div.innerText = msg;
+            document.getElementById('chat-output').appendChild(div);
+            return id;
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            document.body.className = isDark ? 'dark bg-slate-950 text-slate-200 min-h-screen' : 'light bg-slate-50 text-slate-900 min-h-screen';
+            document.getElementById('sun-icon').classList.toggle('hidden', isDark);
+            document.getElementById('moon-icon').classList.toggle('hidden', !isDark);
+        }
+
+        setLanguage('en');
+        lucide.createIcons();
+    </script>
+</body>
+</html>
